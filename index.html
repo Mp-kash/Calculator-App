@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="style.css">
+
+  <title>Calculator</title>
+</head>
+<body>
+
+  <p class="js-message message"></p>
+
+  <p class="button-container">
+    <button class="gray-button js-value-button" onclick="addValue('1')">1</button>
+    <button class="gray-button js-value-button" onclick="addValue('2')">2</button>
+    <button class="gray-button js-value-button" onclick="addValue('3')">3</button>
+    <button class="yellow-button" onclick="addValue('+')">+</button>
+  </p>
+
+  <p class="button-container">
+    <button class="gray-button js-value-button" onclick="addValue('4')">4</button>
+    <button class="gray-button js-value-button" onclick="addValue('5')">5</button>
+    <button class="gray-button js-value-button" onclick="addValue('6')">6</button>
+    <button class="yellow-button" onclick="addValue('-')">-</button>
+  </p>
+  
+  <p class="button-container">
+    <button class="gray-button js-value-button" onclick="addValue('7')">7</button>
+    <button class="gray-button js-value-button" onclick="addValue('8')">8</button>
+    <button class="gray-button js-value-button" onclick="addValue('9')">9</button>
+    <button class="yellow-button" onclick="addValue('*')">*</button>
+  </p>
+  
+  <p class="button-container">
+    <button class="gray-button js-value-button" onclick="addValue('0')">0</button>
+    <button class="gray-button js-value-button" onclick="addValue('.')">.</button>
+    <button class="gray-button js-value-button" onclick="addValue('=')">=</button>
+    <button class="yellow-button" onclick="addValue('/')">/</button>
+  </p>
+
+
+  <p class="button-container">
+    <button class="clear-button js-clear-button">Clear</button>
+    <button class="remove-button js-remove-button">x</button>
+  </p>
+
+  <script>
+    let calculate = localStorage.getItem('calculate') || '';
+    let count = 0;
+
+    document.querySelector('.js-message').innerHTML = calculate;
+
+    function addValue(value){
+      if(value === '='){
+
+        if (hasConsecutiveOperators(calculate, '*') || hasConsecutiveOperators(calculate, '/')) {
+          return;
+        }
+
+         // Check if the expression ends with an operator
+         if (/[\+\-\*/]$/.test(calculate)) {
+            return;
+          }
+        try{
+          calculate = preprocessExpression(calculate);
+
+          calculate = eval(calculate).toString();
+        } catch (error){
+          calculate = 'Error';
+        }
+      } else{
+        calculate += value;
+      }
+
+      document.querySelector('.js-message').innerHTML = calculate;
+      localStorage.setItem('calculate', calculate);
+    }
+
+    function preprocessExpression(expression) {
+      // Replace multiple '+' with a single '+'
+      expression = expression.replace(/\++/g, '+');
+
+      // Replace multiple '-' with a single '+' or '-' based on count
+      expression = expression.replace(/-+/g, (match) => {
+        return match.length % 2 === 0 ? '+' : '-';
+      });
+
+      return expression;
+    }
+
+    function hasConsecutiveOperators(expression, operator) {
+      // Check if the expression contains consecutive operators
+      return expression.includes(`${operator}${operator}`);
+    }
+
+      document.querySelector('.js-clear-button').addEventListener('click', () => {
+        calculate = '';
+        document.querySelector('.js-message').innerHTML = calculate;
+        localStorage.setItem('calculate', calculate);
+      });
+
+      document.querySelector('.js-remove-button').addEventListener('click', () => {
+        calculate = calculate.slice(0, -1);
+        document.querySelector('.js-message').innerHTML = calculate;
+        localStorage.setItem('calculate', calculate);
+      });
+
+  </script>
+</body>
+</html>
